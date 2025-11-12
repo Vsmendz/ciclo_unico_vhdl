@@ -63,7 +63,7 @@ end component;
 
 
 signal src_a,src_b,result_ula,imm_extend,result_wd3,pc_in,pc_in2,pc_jump_sl2: std_logic_vector(31 downto 0);
-signal mux_ula_srcb,pc_out_sig,result_pcplus4,imm_sl2,result_pcbranch,result_jump_sl2: std_logic_vector(31 downto 0);
+signal mux_ula_srcb,pc_out_sig,result_pcplus4,imm_sl2,result_pcbranch,result_jump_sl2,final_pcjump: std_logic_vector(31 downto 0);
 signal wa_instr : std_logic_vector(4 downto 0);
 
 begin
@@ -94,8 +94,10 @@ begin
 	pc_jump_sl2 <= ("111111" & instr(25 downto 0)) when instr(25) = '1' else ("000000" & instr(25 downto 0));
 	pc_jump : sl2 port map(a => pc_jump_sl2,y => result_jump_sl2);	
 	
+	final_pcjump <= (result_pcplus4(31 downto 28) & result_jump_sl2(27 downto 0)); 
+	
 	mux_pc_1 : mux2 port map(d0 => result_pcplus4,d1 => result_pcbranch,s => pc_src,y => pc_in);
-	mux_px_2 : mux2 port map(d0 => pc_in,d1 => result_jump_sl2,s => jump,y => pc_in2);
+	mux_px_2 : mux2 port map(d0 => pc_in,d1 => final_pcjump,s => jump,y => pc_in2);
 	
 end;
 
